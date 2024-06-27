@@ -7,8 +7,14 @@ export class users {
   @PrimaryGeneratedColumn()
   userId: number;
 
-  @Column({ length: 30, nullable: false })
-  @Length(5, 30)
+  @Column({
+    length: Number(process.env.USERNAME_MAX_LENGTH) || 32,
+    nullable: false,
+  })
+  @Length(
+    Number(process.env.USERNAME_MIN_LENGTH) || 2,
+    Number(process.env.USERNAME_MAX_LENGTH) || 32,
+  )
   username: string;
 
   @Column({ length: 320, nullable: false })

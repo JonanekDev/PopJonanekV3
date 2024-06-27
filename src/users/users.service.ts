@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { users } from './users.entity';
+import { users } from './entities/users.entity';
 import { DataSource } from 'typeorm';
 
 @Injectable()
@@ -24,5 +24,10 @@ export class UsersService {
   async checkEmail(email: string): Promise<boolean> {
     const check = await this.usersRepository.existsBy({ email: email });
     return check;
+  }
+
+  async getUserByEmail(email: string): Promise<users> {
+    const user = await this.usersRepository.findOne({ email: email });
+    return user;
   }
 }

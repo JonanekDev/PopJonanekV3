@@ -1,11 +1,11 @@
 import { Inject, Injectable } from '@nestjs/common';
-
 import * as bcrypt from 'bcrypt';
 
 import { HashedPasswordDto } from './dto/hashedpassword.dto';
 import { UsersService } from 'src/users/users.service';
 import { RegisterDto } from './dto/register.dto';
 import { ResDto } from 'src/dto/res.dto';
+import { LoginDto } from './dto/login.dto';
 
 @Injectable()
 export class AuthService {
@@ -43,6 +43,30 @@ export class AuthService {
     return {
       status: 'ok',
       data: newUser,
+    };
+  }
+
+  async loginUser(loginDto: LoginDto): Promise<ResDto> {
+    const user = await this.usersService.getUserByEmail(loginDto.email);
+    if (!user) {
+      return {
+        status: 'error',
+        errCodes: [3],
+      };
+    }
+    const passwordHash = await bcrypt.hash(
+      loginDto.password,
+      user.passwordSalt,
+    );
+    if (passwordHash !== user.password) {
+      return {
+        status: 'error',
+        errCodes: [4],
+      };
+    }
+    return {
+      status: 'ok',
+      data: user,
     };
   }
 

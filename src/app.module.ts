@@ -4,13 +4,12 @@ import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { users } from './users/users.entity';
+import { users } from './users/entities/users.entity';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { AuthService } from './auth/auth.service';
-import { EmailcodesModule } from './emailcodes/emailcodes.module';
 import { UsersService } from './users/users.service';
-
+import { MailModule } from './mail/mail.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -28,7 +27,7 @@ import { UsersService } from './users/users.service';
     }),
     UsersModule,
     AuthModule,
-    EmailcodesModule,
+    MailModule,
   ],
   controllers: [AppController],
   providers: [AppService, UsersService, AuthService],

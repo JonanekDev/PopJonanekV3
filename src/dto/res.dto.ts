@@ -1,4 +1,4 @@
-import { users } from 'src/users/users.entity';
+import { users } from 'src/users/entities/users.entity';
 
 export interface ResDto {
   status: 'ok' | 'error';
