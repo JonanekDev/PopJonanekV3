@@ -1,25 +1,18 @@
+import { ConfigService } from '@nestjs/config';
 import { IsEmail, Length, Matches } from 'class-validator';
 
+const configService = new ConfigService();
+
 export class RegisterDto {
-  @Length(
-    Number(process.env.USERNAME_MIN_LENGTH) || 8,
-    Number(process.env.USERNAME_MAX_LENGTH) || 50,
-  )
+  @Length(configService.get('username.min'), configService.get('username.max'))
   username: string;
 
   @IsEmail()
   email: string;
 
-  @Length(
-    Number(process.env.PASSWORD_MIN_LENGTH) || 8,
-    Number(process.env.PASSWORD_MAX_LENGTH) || 50,
-  )
-  @Matches(
-    RegExp(process.env.PASSWORD_REGEX) ||
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/,
-    {
-      message: 'Heslo je příliš jednoduché',
-    },
-  )
+  @Length(configService.get('password.min'), configService.get('password.max'))
+  @Matches(configService.get<RegExp>('password.regex'), {
+    message: 'Heslo je příliš jednoduché',
+  })
   password: string;
 }

@@ -21,25 +21,32 @@ Kvalitní API v nest.js pro hru PopJonanek!
 | /shop/items/[ID]/purchase | POST   | Zakoupení předmětů v obchodu                  | ✔               |                                 |                                                                       |
 
 ## Env proměnné
-| Proměnná            | Povinné | Výchozí hodnota                                                             | Popis                                       |
-|---------------------|---------|-----------------------------------------------------------------------------|---------------------------------------------|
-| DB_HOST             | ❌   | 127.0.0.1                                                                   | IP adresa/hostname databázového serveru     |
-| DB_PORT             | ❌   | 3306                                                                        | Port databázového serveru                   |
-| DB_USER             | ✔    |                                                                             | Uživatel pro připojení na databázi          |
-| DB_PASSWORD         | ✔    |                                                                             | Heslo pro připojení na databázi             |
-| DB_DATABASE         | ✔    |                                                                             | Název databáze na databázovém serveru       |
-| USERNAME_MIN_LENGTH | ❌   | 2                                                                           | Minimální délka přezdívky                   |
-| USERNAME_MAX_LENGTH | ❌   | 32                                                                          | Maximální délka přezdívky                   |
-| PASSWORD_MIN_LENGTH | ❌   | 8                                                                           | Minimální délka hesla                       |
-| PASSWORD_MAX_LENGTH | ❌   | 50                                                                          | Maximální délka přezdívky                   |
-| PASSWORD_REGEX      | ❌   | /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&amp;])[A-Za-z\d@$!%*?&amp;]+$/ | Regex požadavky na heslo                    |
-| SMTP_HOST           | ✔    |                                                                             | IP adresa/hostname SMTP serveru             |
-| SMTP_PORT           | ❌   | 465                                                                         | Port SMTP serveru                           |
-| SMTP_TLS            | ❌   | ✔                                                                        | Povolení/zakázání TLS pro připojení na SMTP |
-| SMTP_USERNAME       | ✔    |                                                                             | Uživatel pro připojení na SMTP server       |
-| SMTP_PASSWORD       | ✔    |                                                                             | Heslo pro připojení na SMTP server          |
-
-
+| Proměnná                | Povinné | Výchozí hodnota                                                             | Popis                                               |
+|-------------------------|---------|-----------------------------------------------------------------------------|-----------------------------------------------------|
+| API_PORT                | false   | 3000                                                                        |                                                     |
+| DB_HOST                 | false   | 127.0.0.1                                                                   | IP adresa/hostname databázového serveru             |
+| DB_PORT                 | false   | 3306                                                                        | Port databázového serveru                           |
+| DB_USER                 | true    |                                                                             | Uživatel pro připojení na databázi                  |
+| DB_PASSWORD             | true    |                                                                             | Heslo pro připojení na databázi                     |
+| DB_DATABASE             | true    |                                                                             | Název databáze na databázovém serveru               |
+| USERNAME_MIN_LENGTH     | false   | 2                                                                           | Minimální délka přezdívky                           |
+| USERNAME_MAX_LENGTH     | false   | 32                                                                          | Maximální délka přezdívky                           |
+| PASSWORD_MIN_LENGTH     | false   | 8                                                                           | Minimální délka hesla                               |
+| PASSWORD_MAX_LENGTH     | false   | 50                                                                          | Maximální délka přezdívky                           |
+| PASSWORD_REGEX          | false   | /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&amp;])[A-Za-z\d@$!%*?&amp;]+$/ | Regex požadavky na heslo                            |
+| HASH_SALT_ROUNDS        | false   | 10                                                                          |                                                     |
+| SMTP_HOST               | true    |                                                                             | IP adresa/hostname SMTP serveru                     |
+| SMTP_PORT               | false   | 465                                                                         | Port SMTP serveru                                   |
+| SMTP_TLS                | false   | true                                                                        | Povolení/zakázání TLS pro připojení na SMTP         |
+| SMTP_USER               | true    |                                                                             | Uživatel pro připojení na SMTP server               |
+| SMTP_PASSWORD           | true    |                                                                             | Heslo pro připojení na SMTP server                  |
+| MAIL_FROM               | true    |                                                                             | Adresa, ze které se budou posílat emaily            |
+| MAIL_TOKEN_LENGTH_BYTES | false   | 8                                                                           | Délka tokenu v mailech v bytech                     |
+| MAIL_TOKEN_VALIDITY     | false   | 15                                                                          | Délka platnosti tokenu z mailu v minutách           |
+| JWT_SECRET              | true    |                                                                             |                                                     |
+| JWT_EXPIRES_IN          | false   | 7d                                                                          |                                                     |
+| CLICKS_UPDATE_LIMIT     | false   | 600                                                                         | Maximální počet kliknutí za aktualizaci kliků       |
+| CACHE_TTL               | false   | 60                                                                          | Délka cachování (/clicks/total /clicks/leaderboard) |
 
 ## Spuštění API
 

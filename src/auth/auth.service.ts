@@ -1,16 +1,28 @@
-import { Inject, Injectable } from '@nestjs/common';
-import * as bcrypt from 'bcrypt';
+import { Injectable } from '@nestjs/common';
+import { hash, compare } from 'bcrypt';
 
-import { HashedPasswordDto } from './dto/hashedpassword.dto';
 import { UsersService } from 'src/users/users.service';
 import { RegisterDto } from './dto/register.dto';
 import { ResDto } from 'src/dto/res.dto';
 import { LoginDto } from './dto/login.dto';
+import { ForgotPasswordDto } from './dto/forgotpasssword.dto';
+import { MailService } from 'src/mail/mail.service';
+import { users } from 'src/users/entities/users.entity';
+import { JwtService } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class AuthService {
-  @Inject(UsersService)
-  private readonly usersService: UsersService;
+  constructor(
+    private usersService: UsersService,
+    private jwtService: JwtService,
+    private mailService: MailService,
+    private configService: ConfigService,
+  ) {}
+
+  async validateUser(userId: number): Promise<users> {
+    return await this.usersService.getUserById(userId);
+  }
 
   async registerUser(registerdto: RegisterDto): Promise<ResDto> {
     const errCodes: number[] = [];
@@ -20,14 +32,16 @@ export class AuthService {
       errCodes.push(1);
     }
 
-    const hashedPassword = await this.hashPassword(registerdto.password);
+    const hashedPassword = await hash(
+      registerdto.password,
+      this.configService.get<number>('password.hashSaltRounds'),
+    );
     let newUser;
     try {
       newUser = await this.usersService.createUser({
         username: registerdto.username,
         email: registerdto.email,
-        password: hashedPassword.passwordHash,
-        passwordSalt: hashedPassword.salt,
+        password: hashedPassword,
         regDate: new Date(),
         lastLogDate: new Date(),
       });
@@ -40,6 +54,8 @@ export class AuthService {
         errCodes,
       };
     }
+    const authToken = this.jwtService.sign({ userId: newUser.userId });
+    newUser.authToken = authToken;
     return {
       status: 'ok',
       data: newUser,
@@ -54,32 +70,34 @@ export class AuthService {
         errCodes: [3],
       };
     }
-    const passwordHash = await bcrypt.hash(
-      loginDto.password,
-      user.passwordSalt,
-    );
-    if (passwordHash !== user.password) {
+    const passwordCheck = await compare(loginDto.password, user.password);
+    if (!passwordCheck) {
       return {
         status: 'error',
         errCodes: [4],
       };
     }
+    const authToken = this.jwtService.sign({ userId: user.userId });
+    user.authToken = authToken;
     return {
       status: 'ok',
       data: user,
     };
   }
 
-  async hashPassword(
-    password: string,
-    salt?: string,
-  ): Promise<HashedPasswordDto> {
-    if (!salt) {
-      salt = await bcrypt.genSalt();
+  async forgotPassword(forgotPasswordDto: ForgotPasswordDto): Promise<ResDto> {
+    const user = await this.usersService.getUserByEmail(
+      forgotPasswordDto.email,
+    );
+    if (!user) {
+      return {
+        status: 'error',
+        errCodes: [3],
+      };
     }
+    await this.mailService.sendMail('reset', user);
     return {
-      salt,
-      passwordHash: await bcrypt.hash(password, salt),
+      status: 'ok',
     };
   }
 }

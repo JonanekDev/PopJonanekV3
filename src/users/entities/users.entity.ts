@@ -1,6 +1,9 @@
 import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
 import { Length, IsEmail } from 'class-validator';
 import { Exclude } from 'class-transformer';
+import { ConfigService } from '@nestjs/config';
+
+const configService = new ConfigService();
 
 @Entity()
 export class users {
@@ -8,37 +11,33 @@ export class users {
   userId: number;
 
   @Column({
-    length: Number(process.env.USERNAME_MAX_LENGTH) || 32,
+    length: configService.get<number>('username.max'),
     nullable: false,
   })
   @Length(
-    Number(process.env.USERNAME_MIN_LENGTH) || 2,
-    Number(process.env.USERNAME_MAX_LENGTH) || 32,
+    configService.get<number>('username.min'),
+    configService.get<number>('username.max'),
   )
   username: string;
 
-  @Column({ length: 320, nullable: false })
+  @Column({ length: 320, nullable: false, unique: true })
   @IsEmail()
   email: string;
-
-  @Column()
-  @Exclude()
-  passwordSalt: string;
 
   @Column({ type: 'char', length: 60, nullable: true })
   @Exclude()
   password: string;
 
-  @Column({ default: false })
+  @Column({ default: false, nullable: false })
   verified: boolean;
 
-  @Column({ default: 0 })
+  @Column({ default: 0, nullable: false })
   totalClicks: number;
 
-  @Column({ default: 0 })
+  @Column({ default: 0, nullable: false })
   clicks: number;
 
-  @Column({ type: 'bigint', default: null, nullable: true })
+  @Column({ type: 'bigint', default: null, nullable: true, unique: true })
   discordId: string;
 
   @Column({ default: null })
@@ -51,4 +50,6 @@ export class users {
   @Column({ nullable: false })
   @Exclude()
   lastLogDate: Date;
+
+  authToken: string;
 }
