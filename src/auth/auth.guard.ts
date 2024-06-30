@@ -7,6 +7,7 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
 import { ConfigService } from '@nestjs/config';
+import { ResDto } from 'src/dto/res.dto';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -16,10 +17,10 @@ export class AuthGuard implements CanActivate {
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    const request = context.switchToHttp().getRequest();
+    const request: Request = context.switchToHttp().getRequest();
     const token = this.extractTokenFromHeader(request);
     if (!token) {
-      throw new UnauthorizedException();
+      throw new UnauthorizedException(this.unauthorizedResponse());
     }
     try {
       const payload = await this.jwtService.verifyAsync(token, {
@@ -27,7 +28,7 @@ export class AuthGuard implements CanActivate {
       });
       request['userId'] = payload.userId;
     } catch {
-      throw new UnauthorizedException();
+      throw new UnauthorizedException(this.unauthorizedResponse());
     }
     return true;
   }
@@ -35,5 +36,13 @@ export class AuthGuard implements CanActivate {
   private extractTokenFromHeader(request: Request): string | undefined {
     const [type, token] = request.headers.authorization?.split(' ') ?? [];
     return type === 'Bearer' ? token : undefined;
+  }
+
+  private unauthorizedResponse(): ResDto {
+    return {
+      status: 'error',
+      errCodes: [7],
+      data: null,
+    };
   }
 }

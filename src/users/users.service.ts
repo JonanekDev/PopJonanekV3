@@ -81,4 +81,9 @@ export class UsersService {
       data: totalClicks.total,
     };
   }
+
+  async updateUser(user: users): Promise<users> {
+    await this.usersRepository.save(user);
+    return user;
+  }
 }

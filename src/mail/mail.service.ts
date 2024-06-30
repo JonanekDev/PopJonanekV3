@@ -87,4 +87,11 @@ export class MailService {
     await this.mailRepository.save(mailCode);
     return token;
   }
+
+  async verifyToken(token: string): Promise<mailCodes> {
+    const mailCode = await this.mailRepository.findOne({
+      where: { token: token },
+    });
+    return mailCode;
+  }
 }

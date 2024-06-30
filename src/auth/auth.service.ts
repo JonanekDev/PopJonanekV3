@@ -10,6 +10,7 @@ import { MailService } from 'src/mail/mail.service';
 import { users } from 'src/users/entities/users.entity';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
+import { EmailVerifyDto } from './dto/emailverify.dto';
 
 @Injectable()
 export class AuthService {
@@ -54,6 +55,7 @@ export class AuthService {
         errCodes,
       };
     }
+    this.mailService.sendMail('verify', newUser);
     const authToken = this.jwtService.sign({ userId: newUser.userId });
     newUser.authToken = authToken;
     return {
@@ -96,6 +98,34 @@ export class AuthService {
       };
     }
     await this.mailService.sendMail('reset', user);
+    return {
+      status: 'ok',
+    };
+  }
+
+  async resendEmailVerify(userId: number): Promise<ResDto> {
+    const user = await this.usersService.getUserById(userId);
+    if (user.verified) {
+      return {
+        status: 'error',
+        errCodes: [9],
+      };
+    }
+    this.mailService.sendMail('verify', user);
+    return null;
+  }
+
+  async emailVerify(emailVerifyDto: EmailVerifyDto): Promise<ResDto> {
+    const mailCode = await this.mailService.verifyToken(emailVerifyDto.token);
+    if (!mailCode) {
+      return {
+        status: 'error',
+        errCodes: [8],
+      };
+    }
+    const user = await this.usersService.getUserById(mailCode.userId);
+    user.verified = true;
+    await this.usersService.updateUser(user);
     return {
       status: 'ok',
     };

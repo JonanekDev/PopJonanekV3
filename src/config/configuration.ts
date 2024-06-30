@@ -46,4 +46,6 @@ export default () => ({
   clicksUpdateLimit: parseInt(process.env.CLICKS_UPDATE_LIMIT) || 600,
 
   cacheTTL: parseInt(process.env.CACHE_TTL) || 60,
+
+  corsOrigin: process.env.CORS_ORIGIN || '*',
 });

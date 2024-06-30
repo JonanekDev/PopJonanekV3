@@ -11,6 +11,7 @@ import {
 import { AuthGuard } from 'src/auth/auth.guard';
 import { UsersService } from './users.service';
 import { UpdateClicksDto } from './dto/updateclicks.dto';
+import { ResDto } from 'src/dto/res.dto';
 
 @Controller('user')
 export class UsersController {
@@ -19,8 +20,12 @@ export class UsersController {
   @UseInterceptors(ClassSerializerInterceptor)
   @UseGuards(AuthGuard)
   @Get('/')
-  async getUser(@Req() req) {
-    return await this.usersService.getUserById(req.userId);
+  async getUser(@Req() req): Promise<ResDto> {
+    const user = await this.usersService.getUserById(req.userId);
+    return {
+      status: 'ok',
+      data: user,
+    };
   }
 
   @UseGuards(AuthGuard)
