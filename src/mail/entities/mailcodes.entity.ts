@@ -1,10 +1,19 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { users } from 'src/users/entities/users.entity';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  ManyToOne,
+  JoinColumn,
+} from 'typeorm';
 
 @Entity()
 export class mailCodes {
   @PrimaryGeneratedColumn()
   emailCodeId: number;
 
+  @ManyToOne(() => users)
+  @JoinColumn({ name: 'userId' })
   @Column({ nullable: false })
   userId: number;
 

@@ -43,8 +43,6 @@ export class AuthService {
         username: registerdto.username,
         email: registerdto.email,
         password: hashedPassword,
-        regDate: new Date(),
-        lastLogDate: new Date(),
       });
     } catch (error) {
       errCodes.push(2);
@@ -79,6 +77,8 @@ export class AuthService {
         errCodes: [4],
       };
     }
+    user.lastLogDate = new Date();
+    await this.usersService.updateUser(user);
     const authToken = this.jwtService.sign({ userId: user.userId });
     user.authToken = authToken;
     return {

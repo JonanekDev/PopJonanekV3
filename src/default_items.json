@@ -1,0 +1,22 @@
+[
+    {
+        "type": 0,
+        "name": "Smích",
+        "rarity": 0,
+        "multiplier": 1,
+        "chestId": 0
+    },
+    {
+        "type": 0,
+        "name": "Smile",
+        "rarity": 0,
+        "multiplier": 1,
+        "chestId": 0
+    },
+    {
+       "type": 0,
+       "name": "Thinking",
+       "rarity": 1, 
+       "multiplier": 1.1
+    }
+]

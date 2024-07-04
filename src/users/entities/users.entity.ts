@@ -2,6 +2,7 @@ import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
 import { Length, IsEmail } from 'class-validator';
 import { Exclude } from 'class-transformer';
 import { ConfigService } from '@nestjs/config';
+import { inventories } from './inventories.entity';
 
 const configService = new ConfigService();
 
@@ -28,7 +29,7 @@ export class users {
   @Exclude()
   password: string;
 
-  @Column({ default: false, nullable: false })
+  @Column({ width: 1, default: false, nullable: false })
   verified: boolean;
 
   @Column({ default: 0, nullable: false })
@@ -43,13 +44,17 @@ export class users {
   @Column({ default: null })
   avatarId: number;
 
-  @Column({ nullable: false })
+  @Column({ default: () => 'CURRENT_TIMESTAMP' })
   @Exclude()
   regDate: Date;
 
-  @Column({ nullable: false })
+  @Column({ default: () => 'CURRENT_TIMESTAMP' })
   @Exclude()
   lastLogDate: Date;
 
+  inventory: inventories[];
+
   authToken: string;
+
+  //TODO: relation mailcodes
 }

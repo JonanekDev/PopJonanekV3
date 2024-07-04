@@ -1,7 +1,10 @@
 export default () => ({
   apiPort: parseInt(process.env.PORT) || 3000,
+
   jwtSecret: process.env.JWT_SECRET,
+
   jwtExpiresIn: process.env.JWT_EXPIRES_IN || '7d',
+
   db: {
     host: process.env.DB_HOST || '127.0.0.1',
     port: parseInt(process.env.DB_PORT) || 3306,

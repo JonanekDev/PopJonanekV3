@@ -1,0 +1,14 @@
+[
+    {
+        "name": "Obyčejná truhla",
+        "price": 1200
+    },
+    {
+        "name": "Vzácná truhla",
+        "price": 6000
+    },
+    {
+        "name": "Legendární truhla",
+        "price": 12000
+    }
+]

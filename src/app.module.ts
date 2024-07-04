@@ -15,7 +15,10 @@ import configuration from './config/configuration';
 import { JwtModule } from '@nestjs/jwt';
 import { ClicksModule } from './clicks/clicks.module';
 import { CacheModule } from '@nestjs/cache-manager';
-import { ItemsModule } from './items/items.module';
+import { items } from './shop/entitities/items.entity';
+import { ShopModule } from './shop/shop.module';
+import { chests } from './shop/entitities/chests.entity';
+import { inventories } from './users/entities/inventories.entity';
 
 @Module({
   imports: [
@@ -41,7 +44,7 @@ import { ItemsModule } from './items/items.module';
         username: configService.get<string>('db.user'),
         password: configService.get<string>('db.password'),
         database: configService.get<string>('db.database'),
-        entities: [users, mailCodes],
+        entities: [users, mailCodes, items, chests, inventories],
         synchronize: true,
       }),
     }),
@@ -57,7 +60,7 @@ import { ItemsModule } from './items/items.module';
     AuthModule,
     MailModule,
     ClicksModule,
-    ItemsModule,
+    ShopModule,
   ],
   controllers: [AppController],
   providers: [AppService, UsersService, AuthService],
