@@ -46,9 +46,17 @@ export default () => ({
     expiresIn: process.env.JWT_EXPIRES_IN || '7d',
   },
 
-  clicksUpdateLimit: parseInt(process.env.CLICKS_UPDATE_LIMIT) || 600,
+  rateLimits: {
+    global: parseInt(process.env.RATELIMIT_GLOBAL) || 50,
+    clicksUpdateTTL: parseInt(process.env.RATELIMIT_CLICKS_UPDATE_TTL) || 15,
+  },
 
-  cacheTTL: parseInt(process.env.CACHE_TTL) || 60,
+  clicksUpdateLimit: parseInt(process.env.CLICKS_UPDATE_LIMIT) || 500,
+
+  cache: {
+    clicks: parseInt(process.env.CACHE_TTL_CLICKS) || 60,
+    shop: parseInt(process.env.CACHE_TTL_SHOP) || 600,
+  },
 
   corsOrigin: process.env.CORS_ORIGIN || '*',
 });

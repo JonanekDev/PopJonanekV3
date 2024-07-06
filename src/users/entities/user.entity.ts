@@ -1,13 +1,21 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  ManyToOne,
+  JoinColumn,
+  OneToMany,
+} from 'typeorm';
 import { Length, IsEmail } from 'class-validator';
 import { Exclude } from 'class-transformer';
 import { ConfigService } from '@nestjs/config';
-import { inventories } from './inventories.entity';
+import { Inventory } from './inventory.entity';
+import { Item } from 'src/shop/entitities/item.entity';
 
 const configService = new ConfigService();
 
-@Entity()
-export class users {
+@Entity('users')
+export class User {
   @PrimaryGeneratedColumn()
   userId: number;
 
@@ -38,6 +46,14 @@ export class users {
   @Column({ default: 0, nullable: false })
   clicks: number;
 
+  @ManyToOne(() => Item)
+  @JoinColumn({ name: 'activeBackgroundId' })
+  activeBackgroundId: number;
+
+  @ManyToOne(() => Item)
+  @JoinColumn({ name: 'activeSoundId' })
+  activeSoundId: number;
+
   @Column({ type: 'bigint', default: null, nullable: true, unique: true })
   discordId: string;
 
@@ -52,7 +68,8 @@ export class users {
   @Exclude()
   lastLogDate: Date;
 
-  inventory: inventories[];
+  @OneToMany(() => Inventory, (inventory) => inventory.userId)
+  inventory: Inventory[];
 
   authToken: string;
 

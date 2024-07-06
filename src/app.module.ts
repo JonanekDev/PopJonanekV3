@@ -4,7 +4,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { users } from './users/entities/users.entity';
+import { User } from './users/entities/user.entity';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { AuthService } from './auth/auth.service';
@@ -14,11 +14,12 @@ import { mailCodes } from './mail/entities/mailcodes.entity';
 import configuration from './config/configuration';
 import { JwtModule } from '@nestjs/jwt';
 import { ClicksModule } from './clicks/clicks.module';
-import { CacheModule } from '@nestjs/cache-manager';
-import { items } from './shop/entitities/items.entity';
+import { Item } from './shop/entitities/item.entity';
 import { ShopModule } from './shop/shop.module';
-import { chests } from './shop/entitities/chests.entity';
-import { inventories } from './users/entities/inventories.entity';
+import { Chest } from './shop/entitities/chest.entity';
+import { Inventory } from './users/entities/inventory.entity';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { APP_GUARD } from '@nestjs/core';
 
 @Module({
   imports: [
@@ -44,17 +45,19 @@ import { inventories } from './users/entities/inventories.entity';
         username: configService.get<string>('db.user'),
         password: configService.get<string>('db.password'),
         database: configService.get<string>('db.database'),
-        entities: [users, mailCodes, items, chests, inventories],
+        entities: [User, mailCodes, Item, Chest, Inventory],
         synchronize: true,
       }),
     }),
-    CacheModule.registerAsync({
-      isGlobal: true,
+    ThrottlerModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
-      useFactory: async (configService: ConfigService) => ({
-        ttl: configService.get<number>('cacheTTL') * 1000,
-      }),
+      useFactory: (configService: ConfigService) => [
+        {
+          ttl: 60000,
+          limit: configService.get<number>('rateLimits.global'),
+        },
+      ],
     }),
     UsersModule,
     AuthModule,
@@ -63,8 +66,14 @@ import { inventories } from './users/entities/inventories.entity';
     ShopModule,
   ],
   controllers: [AppController],
-  providers: [AppService, UsersService, AuthService],
+  providers: [
+    AppService,
+    UsersService,
+    AuthService,
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
+  ],
 })
-export class AppModule {
-  constructor(private configService: ConfigService) {}
-}
+export class AppModule {}

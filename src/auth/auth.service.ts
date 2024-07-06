@@ -1,13 +1,12 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { hash, compare } from 'bcrypt';
 
 import { UsersService } from 'src/users/users.service';
 import { RegisterDto } from './dto/register.dto';
-import { ResDto } from 'src/dto/res.dto';
 import { LoginDto } from './dto/login.dto';
 import { ForgotPasswordDto } from './dto/forgotpasssword.dto';
 import { MailService } from 'src/mail/mail.service';
-import { users } from 'src/users/entities/users.entity';
+import { User } from 'src/users/entities/user.entity';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { EmailVerifyDto } from './dto/emailverify.dto';
@@ -21,18 +20,21 @@ export class AuthService {
     private configService: ConfigService,
   ) {}
 
-  async validateUser(userId: number): Promise<users> {
+  async validateUser(userId: number): Promise<User> {
     return await this.usersService.getUserById(userId);
   }
 
-  async registerUser(registerdto: RegisterDto): Promise<ResDto> {
-    const errCodes: number[] = [];
-
+  async registerUser(registerdto: RegisterDto): Promise<User> {
     const emailExists = await this.usersService.checkEmail(registerdto.email);
     if (emailExists) {
-      errCodes.push(1);
+      throw new HttpException(
+        {
+          statusCode: HttpStatus.BAD_REQUEST,
+          error: 'Uživatel s tímto emailem již existuj',
+        },
+        HttpStatus.BAD_REQUEST,
+      );
     }
-
     const hashedPassword = await hash(
       registerdto.password,
       this.configService.get<number>('password.hashSaltRounds'),
@@ -44,90 +46,74 @@ export class AuthService {
         email: registerdto.email,
         password: hashedPassword,
       });
-    } catch (error) {
-      errCodes.push(2);
-    }
-    if (errCodes.length > 0) {
-      return {
-        status: 'error',
-        errCodes,
-      };
+    } catch (err) {
+      throw err;
     }
     this.mailService.sendMail('verify', newUser);
     const authToken = this.jwtService.sign({ userId: newUser.userId });
     newUser.authToken = authToken;
-    return {
-      status: 'ok',
-      data: newUser,
-    };
+    return newUser;
   }
 
-  async loginUser(loginDto: LoginDto): Promise<ResDto> {
+  async loginUser(loginDto: LoginDto): Promise<User> {
     const user = await this.usersService.getUserByEmail(loginDto.email);
-    if (!user) {
-      return {
-        status: 'error',
-        errCodes: [3],
-      };
-    }
     const passwordCheck = await compare(loginDto.password, user.password);
-    if (!passwordCheck) {
-      return {
-        status: 'error',
-        errCodes: [4],
-      };
+    if (!user || !passwordCheck) {
+      throw new HttpException(
+        {
+          statusCode: HttpStatus.UNAUTHORIZED,
+          error: 'Špatný email nebo heslo',
+        },
+        HttpStatus.UNAUTHORIZED,
+      );
     }
     user.lastLogDate = new Date();
     await this.usersService.updateUser(user);
     const authToken = this.jwtService.sign({ userId: user.userId });
     user.authToken = authToken;
-    return {
-      status: 'ok',
-      data: user,
-    };
+    return user;
   }
 
-  async forgotPassword(forgotPasswordDto: ForgotPasswordDto): Promise<ResDto> {
+  async forgotPassword(forgotPasswordDto: ForgotPasswordDto): Promise<void> {
     const user = await this.usersService.getUserByEmail(
       forgotPasswordDto.email,
     );
     if (!user) {
-      return {
-        status: 'error',
-        errCodes: [3],
-      };
+      throw new HttpException(
+        {
+          statusCode: HttpStatus.NOT_FOUND,
+          error: 'Uživatel s takovým emailem neexistuje',
+        },
+        HttpStatus.NOT_FOUND,
+      );
     }
     await this.mailService.sendMail('reset', user);
-    return {
-      status: 'ok',
-    };
   }
 
-  async resendEmailVerify(userId: number): Promise<ResDto> {
+  async resendEmailVerify(userId: number): Promise<void> {
     const user = await this.usersService.getUserById(userId);
     if (user.verified) {
-      return {
-        status: 'error',
-        errCodes: [9],
-      };
+      throw new HttpException(
+        { statusCode: HttpStatus.BAD_REQUEST, error: 'Email je již ověřen' },
+        HttpStatus.BAD_REQUEST,
+      );
     }
     this.mailService.sendMail('verify', user);
-    return null;
   }
 
-  async emailVerify(emailVerifyDto: EmailVerifyDto): Promise<ResDto> {
+  async emailVerify(emailVerifyDto: EmailVerifyDto): Promise<void> {
     const mailCode = await this.mailService.verifyToken(emailVerifyDto.token);
     if (!mailCode) {
-      return {
-        status: 'error',
-        errCodes: [8],
-      };
+      throw new HttpException(
+        {
+          statusCode: HttpStatus.BAD_REQUEST,
+          error: 'Neplatný ověřovací token',
+        },
+        HttpStatus.BAD_REQUEST,
+      );
     }
     const user = await this.usersService.getUserById(mailCode.userId);
     user.verified = true;
     await this.usersService.updateUser(user);
-    return {
-      status: 'ok',
-    };
   }
 }

@@ -1,6 +1,7 @@
 import {
   CanActivate,
   ExecutionContext,
+  HttpStatus,
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
@@ -40,9 +41,8 @@ export class AuthGuard implements CanActivate {
 
   private unauthorizedResponse(): ResDto {
     return {
-      status: 'error',
-      errCodes: [7],
-      data: null,
+      statusCode: HttpStatus.UNAUTHORIZED,
+      message: 'Neplatný autorizační token',
     };
   }
 }

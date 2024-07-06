@@ -1,8 +1,8 @@
-import { items } from 'src/shop/entitities/items.entity';
+import { Item } from 'src/shop/entitities/item.entity';
 import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
 
-@Entity()
-export class chests {
+@Entity('chests')
+export class Chest {
   @PrimaryGeneratedColumn()
   chestId: number;
 
@@ -12,6 +12,6 @@ export class chests {
   @Column({ nullable: true })
   price: number;
 
-  @OneToMany(() => items, (item) => item.chestId)
-  items: items[];
+  @OneToMany(() => Item, (item) => item.chestId)
+  items: Item[];
 }

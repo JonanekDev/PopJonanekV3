@@ -3,6 +3,9 @@ import {
   ClassSerializerInterceptor,
   Controller,
   Get,
+  HttpException,
+  HttpStatus,
+  Param,
   Post,
   Req,
   UseGuards,
@@ -21,19 +24,38 @@ export class UsersController {
   @UseGuards(AuthGuard)
   @Get('/')
   async getUser(@Req() req): Promise<ResDto> {
-    const user = await this.usersService.getUserById(req.userId);
+    const user = await this.usersService
+      .getUserById(req.userId)
+      .catch((err) => {
+        throw err;
+      });
     return {
-      status: 'ok',
+      statusCode: HttpStatus.OK,
       data: user,
     };
   }
 
   @UseGuards(AuthGuard)
+  //TODO: RATE LIMIT nemam na to nervy teď
   @Post('/clicks')
-  async updateClicks(@Req() req, @Body() updateClicksDto: UpdateClicksDto) {
-    return await this.usersService.updateClicks(
-      req.userId,
-      updateClicksDto.clicks,
-    );
+  async updateClicks(
+    @Req() req,
+    @Body() updateClicksDto: UpdateClicksDto,
+  ): Promise<ResDto> {
+    await this.usersService
+      .updateClicks(req.userId, updateClicksDto.clicks)
+      .catch((err) => {
+        throw err;
+      });
+    return { statusCode: HttpStatus.OK };
+  }
+
+  @UseGuards(AuthGuard)
+  @Post('/useitem/:itemId')
+  async useItem(@Req() req, @Param() useItemDto): Promise<ResDto> {
+    await this.usersService.useItem(req.userId, useItemDto.itemId).catch((err) => {
+      throw err;
+    });
+    return { statusCode: HttpStatus.OK };
   }
 }

@@ -1,4 +1,4 @@
-import { users } from 'src/users/entities/users.entity';
+import { User } from 'src/users/entities/user.entity';
 import {
   Entity,
   Column,
@@ -12,7 +12,7 @@ export class mailCodes {
   @PrimaryGeneratedColumn()
   emailCodeId: number;
 
-  @ManyToOne(() => users)
+  @ManyToOne(() => User)
   @JoinColumn({ name: 'userId' })
   @Column({ nullable: false })
   userId: number;

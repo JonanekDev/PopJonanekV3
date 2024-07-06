@@ -6,7 +6,7 @@ import * as fs from 'fs';
 import { join } from 'path';
 import { mailCodes } from './entities/mailcodes.entity';
 import { DataSource } from 'typeorm';
-import { users } from 'src/users/entities/users.entity';
+import { User } from 'src/users/entities/user.entity';
 import { ConfigService } from '@nestjs/config';
 
 @Injectable()
@@ -40,7 +40,7 @@ export class MailService {
     return html;
   }
 
-  async sendMail(type: 'verify' | 'reset', user: users): Promise<void> {
+  async sendMail(type: 'verify' | 'reset', user: User): Promise<void> {
     const token = await this.createToken(user.userId, type);
     const transporter = this.getTransporter();
     const html = await this.getTemplate(type);

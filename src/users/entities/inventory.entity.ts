@@ -5,21 +5,21 @@ import {
   ManyToOne,
   JoinColumn,
 } from 'typeorm';
-import { users } from './users.entity';
-import { items } from 'src/shop/entitities/items.entity';
+import { User } from './user.entity';
+import { Item } from 'src/shop/entitities/item.entity';
 
-@Entity()
-export class inventories {
+@Entity('inventories')
+export class Inventory {
   @PrimaryGeneratedColumn()
   inventoryId: number;
 
-  @ManyToOne(() => users, (user) => user.inventory)
+  @ManyToOne(() => User, (user) => user.inventory)
   @JoinColumn({ name: 'userId' })
   userId: number;
 
-  @ManyToOne(() => items)
+  @ManyToOne(() => Item)
   @JoinColumn({ name: 'itemId' })
-  itemId: items;
+  itemId: number;
 
   @Column({ default: () => 'CURRENT_TIMESTAMP' })
   purchaseDate: Date;

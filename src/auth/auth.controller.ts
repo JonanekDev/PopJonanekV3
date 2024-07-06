@@ -2,7 +2,7 @@ import {
   Body,
   ClassSerializerInterceptor,
   Controller,
-  Inject,
+  HttpStatus,
   Post,
   Req,
   UseGuards,
@@ -14,36 +14,76 @@ import { LoginDto } from './dto/login.dto';
 import { ForgotPasswordDto } from './dto/forgotpasssword.dto';
 import { EmailVerifyDto } from './dto/emailverify.dto';
 import { AuthGuard } from './auth.guard';
+import { ResDto } from 'src/dto/res.dto';
 
 @Controller('auth')
 export class AuthController {
-  constructor(@Inject(AuthService) private readonly authService: AuthService) {}
+  constructor(private readonly authService: AuthService) {}
 
   @UseInterceptors(ClassSerializerInterceptor)
   @Post('register')
-  async registerUser(@Body() registerdto: RegisterDto) {
-    return await this.authService.registerUser(registerdto);
+  async registerUser(@Body() registerdto: RegisterDto): Promise<ResDto> {
+    try {
+      const user = await this.authService.registerUser(registerdto);
+      return {
+        statusCode: HttpStatus.CREATED,
+        data: user,
+      };
+    } catch (err) {
+      throw err;
+    }
   }
 
   @UseInterceptors(ClassSerializerInterceptor)
   @Post('login')
-  async loginUser(@Body() loginDto: LoginDto) {
-    return await this.authService.loginUser(loginDto);
+  async loginUser(@Body() loginDto: LoginDto): Promise<ResDto> {
+    try {
+      const user = await this.authService.loginUser(loginDto);
+      return {
+        statusCode: HttpStatus.OK,
+        data: user,
+      };
+    } catch (err) {
+      throw err;
+    }
   }
 
   @Post('forgot-password')
-  async forgotPassword(@Body() forgotPasswordDto: ForgotPasswordDto) {
-    return await this.authService.forgotPassword(forgotPasswordDto);
+  async forgotPassword(
+    @Body() forgotPasswordDto: ForgotPasswordDto,
+  ): Promise<ResDto> {
+    try {
+      await this.authService.forgotPassword(forgotPasswordDto);
+      return {
+        statusCode: HttpStatus.OK,
+      };
+    } catch (err) {
+      throw err;
+    }
   }
 
   @UseGuards(AuthGuard)
   @Post('resend-email-verify')
-  async resendEmailVerify(@Req() req) {
-    return await this.authService.resendEmailVerify(req.userId);
+  async resendEmailVerify(@Req() req): Promise<ResDto> {
+    try {
+      await this.authService.resendEmailVerify(req.userId);
+      return {
+        statusCode: HttpStatus.OK,
+      };
+    } catch (err) {
+      throw err;
+    }
   }
 
   @Post('email-verify')
-  async emailVerify(@Body() emailVerifyDto: EmailVerifyDto) {
-    return await this.authService.emailVerify(emailVerifyDto);
+  async emailVerify(@Body() emailVerifyDto: EmailVerifyDto): Promise<ResDto> {
+    try {
+      await this.authService.emailVerify(emailVerifyDto);
+      return {
+        statusCode: HttpStatus.OK,
+      };
+    } catch (err) {
+      throw err;
+    }
   }
 }
