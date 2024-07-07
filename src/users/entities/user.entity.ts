@@ -10,7 +10,6 @@ import { Length, IsEmail } from 'class-validator';
 import { Exclude } from 'class-transformer';
 import { ConfigService } from '@nestjs/config';
 import { Inventory } from './inventory.entity';
-import { Item } from 'src/shop/entitities/item.entity';
 
 const configService = new ConfigService();
 
@@ -46,13 +45,13 @@ export class User {
   @Column({ default: 0, nullable: false })
   clicks: number;
 
-  @ManyToOne(() => Item)
-  @JoinColumn({ name: 'activeBackgroundId' })
-  activeBackgroundId: number;
+  @ManyToOne(() => Inventory)
+  @JoinColumn({ name: 'activeBackgroundInvId' })
+  activeBackground: Inventory;
 
-  @ManyToOne(() => Item)
-  @JoinColumn({ name: 'activeSoundId' })
-  activeSoundId: number;
+  @ManyToOne(() => Inventory)
+  @JoinColumn({ name: 'activeSoundInvId' })
+  activeSound: Inventory;
 
   @Column({ type: 'bigint', default: null, nullable: true, unique: true })
   discordId: string;
@@ -68,7 +67,7 @@ export class User {
   @Exclude()
   lastLogDate: Date;
 
-  @OneToMany(() => Inventory, (inventory) => inventory.userId)
+  @OneToMany(() => Inventory, (inventory) => inventory.user)
   inventory: Inventory[];
 
   authToken: string;

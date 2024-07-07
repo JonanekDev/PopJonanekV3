@@ -15,11 +15,11 @@ export class Inventory {
 
   @ManyToOne(() => User, (user) => user.inventory)
   @JoinColumn({ name: 'userId' })
-  userId: number;
+  user: User;
 
   @ManyToOne(() => Item)
   @JoinColumn({ name: 'itemId' })
-  itemId: number;
+  item: Item;
 
   @Column({ default: () => 'CURRENT_TIMESTAMP' })
   purchaseDate: Date;

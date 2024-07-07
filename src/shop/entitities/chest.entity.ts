@@ -12,6 +12,6 @@ export class Chest {
   @Column({ nullable: true })
   price: number;
 
-  @OneToMany(() => Item, (item) => item.chestId)
+  @OneToMany(() => Item, (item) => item.chest)
   items: Item[];
 }

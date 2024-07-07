@@ -3,7 +3,6 @@ import {
   ClassSerializerInterceptor,
   Controller,
   Get,
-  HttpException,
   HttpStatus,
   Param,
   Post,
@@ -15,6 +14,7 @@ import { AuthGuard } from 'src/auth/auth.guard';
 import { UsersService } from './users.service';
 import { UpdateClicksDto } from './dto/updateclicks.dto';
 import { ResDto } from 'src/dto/res.dto';
+import { UseItemDto } from './dto/useitem.dto';
 
 @Controller('user')
 export class UsersController {
@@ -24,11 +24,7 @@ export class UsersController {
   @UseGuards(AuthGuard)
   @Get('/')
   async getUser(@Req() req): Promise<ResDto> {
-    const user = await this.usersService
-      .getUserById(req.userId)
-      .catch((err) => {
-        throw err;
-      });
+    const user = await this.usersService.getUserById(req.userId);
     return {
       statusCode: HttpStatus.OK,
       data: user,
@@ -42,20 +38,14 @@ export class UsersController {
     @Req() req,
     @Body() updateClicksDto: UpdateClicksDto,
   ): Promise<ResDto> {
-    await this.usersService
-      .updateClicks(req.userId, updateClicksDto.clicks)
-      .catch((err) => {
-        throw err;
-      });
+    await this.usersService.updateClicks(req.userId, updateClicksDto.clicks);
     return { statusCode: HttpStatus.OK };
   }
 
   @UseGuards(AuthGuard)
-  @Post('/useitem/:itemId')
-  async useItem(@Req() req, @Param() useItemDto): Promise<ResDto> {
-    await this.usersService.useItem(req.userId, useItemDto.itemId).catch((err) => {
-      throw err;
-    });
+  @Post('/useitem/:inventoryId')
+  async useItem(@Req() req, @Param() useItemDto: UseItemDto): Promise<ResDto> {
+    await this.usersService.useItem(req.userId, useItemDto.inventoryId);
     return { statusCode: HttpStatus.OK };
   }
 }

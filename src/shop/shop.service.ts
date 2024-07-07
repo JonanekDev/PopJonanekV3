@@ -47,17 +47,20 @@ export class ShopService {
     let newItemForPlayerFromChest: Item;
     do {
       const item = chest.items[Math.floor(Math.random() * chest.items.length)];
-      if (!user.inventory.find((item) => item.itemId === item.itemId)) {
+      if (
+        !user.inventory.find(
+          (inventory) => inventory.item.itemId === item.itemId,
+        )
+      ) {
         newItemForPlayerFromChest = item;
       }
     } while (!newItemForPlayerFromChest);
-    await this.usersService
-      .addItemToUser(user.userId, newItemForPlayerFromChest.itemId)
-      .catch((err) => {
-        throw err;
-      });
     user.clicks -= chest.price;
-    await this.usersService.updateUser(user); //TODO: možná catch? ale co pak? ? ?
+    await this.usersService.updateUser(user);
+    await this.usersService.addItemToUser(
+      user.userId,
+      newItemForPlayerFromChest.itemId,
+    );
     return newItemForPlayerFromChest;
   }
 }

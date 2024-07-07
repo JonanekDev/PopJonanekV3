@@ -39,11 +39,10 @@ export class ShopController {
     @Param() purchaseDto: PurchaseDto,
     @Req() req,
   ): Promise<ResDto> {
-    const itemFromChest = await this.shopService
-      .purchaseChest(purchaseDto.chestId, req.userId)
-      .catch((err) => {
-        throw err;
-      });
+    const itemFromChest = await this.shopService.purchaseChest(
+      purchaseDto.chestId,
+      req.userId,
+    );
     return {
       statusCode: HttpStatus.OK,
       data: itemFromChest,

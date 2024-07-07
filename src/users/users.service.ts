@@ -57,7 +57,12 @@ export class UsersService {
 
   async getUserById(userId: number): Promise<User> {
     const user: User = await this.usersRepository.findOne({
-      relations: ['inventory', 'activeBackgroundId', 'activeSoundId'],
+      relations: [
+        'inventory',
+        'inventory.item',
+        'activeBackground',
+        'activeSound',
+      ],
       where: { userId: userId },
     });
     return user;
@@ -120,16 +125,16 @@ export class UsersService {
 
   async addItemToUser(userId: number, itemId: number): Promise<void> {
     try {
-      const user: User = await this.getUserById(userId);
       const item: Item = await this.itemsRepository.findOne({
         where: { itemId: itemId },
       });
       const newInv = await this.inventoriesRepository.create({
-        user: user,
+        userId: userId,
         itemId: item.itemId,
       });
       await this.inventoriesRepository.save(newInv);
     } catch (err) {
+      console.log(err);
       throw new HttpException(
         {
           statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
@@ -143,7 +148,10 @@ export class UsersService {
   async useItem(userId: number, itemId: number): Promise<void> {
     try {
       const user: User = await this.getUserById(userId);
-      if (!user.inventory.find((item) => item.itemId === itemId)) {
+      const invItem: Inventory = user.inventory.find(
+        (inventory) => inventory.item.itemId == itemId,
+      );
+      if (!invItem) {
         throw new HttpException(
           {
             statusCode: HttpStatus.NOT_FOUND,
@@ -152,7 +160,13 @@ export class UsersService {
           HttpStatus.NOT_FOUND,
         );
       }
-      console.log(user.inventory);
+      const item = invItem.item;
+      if (item.type == 0) {
+        user.activeBackground = invItem;
+      } else {
+        user.activeSound = invItem;
+      }
+      await this.usersRepository.save(user);
     } catch (err) {
       throw new HttpException(
         {

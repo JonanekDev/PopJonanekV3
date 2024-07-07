@@ -23,67 +23,47 @@ export class AuthController {
   @UseInterceptors(ClassSerializerInterceptor)
   @Post('register')
   async registerUser(@Body() registerdto: RegisterDto): Promise<ResDto> {
-    try {
-      const user = await this.authService.registerUser(registerdto);
-      return {
-        statusCode: HttpStatus.CREATED,
-        data: user,
-      };
-    } catch (err) {
-      throw err;
-    }
+    const user = await this.authService.registerUser(registerdto);
+    return {
+      statusCode: HttpStatus.CREATED,
+      data: user,
+    };
   }
 
   @UseInterceptors(ClassSerializerInterceptor)
   @Post('login')
   async loginUser(@Body() loginDto: LoginDto): Promise<ResDto> {
-    try {
-      const user = await this.authService.loginUser(loginDto);
-      return {
-        statusCode: HttpStatus.OK,
-        data: user,
-      };
-    } catch (err) {
-      throw err;
-    }
+    const user = await this.authService.loginUser(loginDto);
+    return {
+      statusCode: HttpStatus.OK,
+      data: user,
+    };
   }
 
   @Post('forgot-password')
   async forgotPassword(
     @Body() forgotPasswordDto: ForgotPasswordDto,
   ): Promise<ResDto> {
-    try {
-      await this.authService.forgotPassword(forgotPasswordDto);
-      return {
-        statusCode: HttpStatus.OK,
-      };
-    } catch (err) {
-      throw err;
-    }
+    await this.authService.forgotPassword(forgotPasswordDto);
+    return {
+      statusCode: HttpStatus.OK,
+    };
   }
 
   @UseGuards(AuthGuard)
   @Post('resend-email-verify')
   async resendEmailVerify(@Req() req): Promise<ResDto> {
-    try {
-      await this.authService.resendEmailVerify(req.userId);
-      return {
-        statusCode: HttpStatus.OK,
-      };
-    } catch (err) {
-      throw err;
-    }
+    await this.authService.resendEmailVerify(req.userId);
+    return {
+      statusCode: HttpStatus.OK,
+    };
   }
 
   @Post('email-verify')
   async emailVerify(@Body() emailVerifyDto: EmailVerifyDto): Promise<ResDto> {
-    try {
-      await this.authService.emailVerify(emailVerifyDto);
-      return {
-        statusCode: HttpStatus.OK,
-      };
-    } catch (err) {
-      throw err;
-    }
+    await this.authService.emailVerify(emailVerifyDto);
+    return {
+      statusCode: HttpStatus.OK,
+    };
   }
 }

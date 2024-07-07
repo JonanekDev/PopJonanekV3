@@ -1,5 +1,6 @@
 import { CacheInterceptor } from '@nestjs/cache-manager';
-import { Controller, Get, UseInterceptors } from '@nestjs/common';
+import { Controller, Get, HttpStatus, UseInterceptors } from '@nestjs/common';
+import { ResDto } from 'src/dto/res.dto';
 import { UsersService } from 'src/users/users.service';
 
 @Controller('clicks')
@@ -8,7 +9,11 @@ export class ClicksController {
 
   @UseInterceptors(CacheInterceptor)
   @Get('/total')
-  async getTotalClicks() {
-    return await this.usersService.getGlobalTotalClicks();
+  async getTotalClicks(): Promise<ResDto> {
+    const clicks = await this.usersService.getGlobalTotalClicks();
+    return {
+      statusCode: HttpStatus.OK,
+      data: clicks,
+    };
   }
 }

@@ -26,6 +26,5 @@ export class Item {
 
   @ManyToOne(() => Chest, (chest) => chest.items)
   @JoinColumn({ name: 'chestId' })
-  @Column({ nullable: false })
-  chestId: number;
+  chest: Chest;
 }
